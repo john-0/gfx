@@ -19,10 +19,13 @@ sudo pip install pexpect
 # Usage
 
 ```bash
-sudo python gfx.py -p [port number]
+sudo python gfx.py -p [port number] --push-user [pushover user key] --push-app [pushover app key]
 ```
 
-The -p argument is optional, the default is 8000
+All arguments are optional
+-p = http server port, default is 8000
+--push-app = Pushover app key, add in order to receive push notifications
+--push-user = Pushover user key, add in order to receive push notifications
 
 # To Do
 
