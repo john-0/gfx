@@ -745,7 +745,7 @@ class GFXConnector():
             self.setStatus(STATUS_DISCONNECTED, 'No Grainfather found')
         except:
             e = sys.exc_info()[0]
-            self.setStatus(STATUS_ERROR, 'Failed to scan devices: ' + e)
+            self.setStatus(STATUS_ERROR, 'Failed to scan devices: %s' % e)
 
     def disconnect(self):
         self.lastBroadcast = 0
