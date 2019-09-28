@@ -838,7 +838,7 @@ class GFXRequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         body = None
         if self.path == '/refresh':
-            if gf.lastBroadcast and time.time() - gf.lastBroadcast > 5:
+            if gf and gf.lastBroadcast and time.time() - gf.lastBroadcast > 5:
                 gf.disconnect()
             body = self._body()
         elif self.path.startswith('/action/'):
