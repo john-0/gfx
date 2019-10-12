@@ -1,5 +1,5 @@
-# gfx - Grainfather bluetooth signal extender
-Grainfather signal extender - Connects to your Grainfather and starts an http server allowing you to control it from any device connected to your home wifi network
+# gfx - Grainfather bluetooth signal extender / repeater
+Grainfather signal extender / repeater - Connects to your Grainfather and starts an http server allowing you to control it from any device connected to your home wifi network
 
 This is meant to be ran on a raspberry pi close to your Grainfather (or any other linux system that can run python). I tried to include everything in a single file and have minimal dependencies. Only basic functions are currently supported
 
