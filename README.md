@@ -19,7 +19,7 @@ sudo pip install pexpect
 ## Usage
 
 ```bash
-sudo python gfx.py -p [port number] --push-user [pushover user key] --push-app [pushover app key]
+sudo python gfx.py -p [port number] --push-user [pushover user key] --push-app [pushover app key] -t [temperature units (C or F)]
 ```
 
 All arguments are optional
@@ -29,7 +29,7 @@ All arguments are optional
 
 ## To Do
 
-- [ ] Add support for Fahrenheit
+- [x] Add support for Fahrenheit
 - [ ] Add support for recipes
 - [ ] Importing recipes from Beersmith and Brewfather
 - [ ] Custom mash profiles

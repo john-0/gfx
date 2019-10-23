@@ -29,6 +29,7 @@ STATUS_CONNECTING = 1
 STATUS_DISCONNECTED = 2
 STATUS_ERROR = 3
 STATUS_CONNECTED = 100
+CELSIUS = True
 
 pageHead = '''
     <html>
@@ -612,6 +613,15 @@ pageFooter='''
 pageEnd = '''</div>
 </body></html>'''
 
+def convertToUserUnits(value):
+    if CELSIUS:
+        return value
+    return round((value * 9 / 5) + 32,1)
+
+def convertToGrainfatherUnits(value):
+    if CELSIUS:
+        return value
+    return round((value - 32) * 5 / 9)
 
 def push(title, message):
     if not PUSHOVER_APP_KEY or not PUSHOVER_USER_KEY:
@@ -696,9 +706,9 @@ class GFXConnector():
                     self.timer.notified = False
 
             elif chr(value[0]) == 'X':
-                self.target = float(values[0])
-                self.current = float(values[1])
-
+                self.target = convertToUserUnits(float(values[0]))
+                self.current = convertToUserUnits(float(values[1]))
+                
             elif chr(value[0]) == 'Y':
                 self.heat = int(values[0]) == 1
                 self.pump = int(values[1]) == 1
@@ -743,9 +753,8 @@ class GFXConnector():
                         self.setStatus(STATUS_ERROR, 'Failed to connect')
                         continue
             self.setStatus(STATUS_DISCONNECTED, 'No Grainfather found')
-        except:
-            e = sys.exc_info()[0]
-            self.setStatus(STATUS_ERROR, 'Failed to scan devices: %s' % e)
+        except Exception, e:
+            self.setStatus(STATUS_ERROR, 'Failed to scan devices: ' + str(e))
 
     def disconnect(self):
         self.lastBroadcast = 0
@@ -765,6 +774,7 @@ class GFXConnector():
         return self.heat and self.current < self.target
   
     def setTemp(self, temp):
+        temp = convertToGrainfatherUnits(temp)
         self._send("$%i," % temp)
 
     def beep(self):
@@ -934,8 +944,9 @@ class GFXRequestHandler(BaseHTTPRequestHandler):
         d = d + timedelta(days=7) 
         maxday = d.strftime("%Y-%m-%d")
         countdown = "%(h)02d:%(m)02d:%(s)02d" % gf.timer if gf.timer.h else "%(m)02d:%(s)02d" % gf.timer
-        return { 'unit': 'C', 
-                'target': gf.target, 
+        unit = 'C' if CELSIUS else 'F'
+        return { 'unit': unit, 
+                'target': round(gf.target), 
                 'current': gf.current, 
                 'currentTempClass': currentTempClass,
                 'checkedHeat': checkedHeat,
@@ -959,7 +970,7 @@ def getLocalIp():
         s.close()
     return ip
 
-opts, args = getopt.getopt(sys.argv[1:],"p:d",["port=", "fake", "push-app=", "push-user="])
+opts, args = getopt.getopt(sys.argv[1:],"p:dt:",["port=", "fake", "push-app=", "push-user="])
 for opt, arg in opts:
     if opt == '--fake':
         FAKE_GF = True
@@ -969,10 +980,13 @@ for opt, arg in opts:
         PUSHOVER_USER_KEY = arg
     elif opt in ('-p', '--port'):
         PORT = int(arg)
+    elif opt == '-t':
+        if arg.lower() == 'c':
+            CELSIUS = True
+        if arg.lower() == 'f':
+            CELSIUS = False
     elif opt == '-d':
         DEBUG = True
-
-
 
 gf = None
 def initGF():
@@ -988,8 +1002,6 @@ if FAKE_GF:
 
 else:
     threading.Thread(target=initGF).start()
-
-    
 
 
 httpd = SocketServer.TCPServer(("", PORT), GFXRequestHandler)
